@@ -94,36 +94,44 @@ public class PlayerGameStatsService {
         }
     }
     
-    private void validateStats(PlayerGameStatsDTO stats) {
-        if (stats.getPoints() < 0) {
-            throw new InvalidStatsException("Points cannot be negative");
+    void validateStats(PlayerGameStatsDTO stats) {
+        // Validate Points
+        if (stats.getPoints() == null || stats.getPoints() < 0) {
+            throw new InvalidStatsException("Points must be a non-negative value");
         }
         
-        if (stats.getRebounds() < 0) {
-            throw new InvalidStatsException("Rebounds cannot be negative");
+        // Validate Rebounds
+        if (stats.getRebounds() == null || stats.getRebounds() < 0) {
+            throw new InvalidStatsException("Rebounds must be a non-negative value");
         }
         
-        if (stats.getAssists() < 0) {
-            throw new InvalidStatsException("Assists cannot be negative");
+        // Validate Assists
+        if (stats.getAssists() == null || stats.getAssists() < 0) {
+            throw new InvalidStatsException("Assists must be a non-negative value");
         }
         
-        if (stats.getSteals() < 0) {
-            throw new InvalidStatsException("Steals cannot be negative");
+        // Validate Steals
+        if (stats.getSteals() == null || stats.getSteals() < 0) {
+            throw new InvalidStatsException("Steals must be a non-negative value");
         }
         
-        if (stats.getBlocks() < 0) {
-            throw new InvalidStatsException("Blocks cannot be negative");
+        // Validate Blocks
+        if (stats.getBlocks() == null || stats.getBlocks() < 0) {
+            throw new InvalidStatsException("Blocks must be a non-negative value");
         }
         
-        if (stats.getFouls() < 0 || stats.getFouls() > 6) {
+        // Validate Fouls
+        if (stats.getFouls() == null || stats.getFouls() < 0 || stats.getFouls() > 6) {
             throw new InvalidStatsException("Fouls must be between 0 and 6");
         }
         
-        if (stats.getTurnovers() < 0) {
-            throw new InvalidStatsException("Turnovers cannot be negative");
+        // Validate Turnovers
+        if (stats.getTurnovers() == null || stats.getTurnovers() < 0) {
+            throw new InvalidStatsException("Turnovers must be a non-negative value");
         }
         
-        if (stats.getMinutesPlayed() < 0 || stats.getMinutesPlayed() > 48.0) {
+        // Validate Minutes Played
+        if (stats.getMinutesPlayed() == null || stats.getMinutesPlayed() < 0 || stats.getMinutesPlayed() > 48.0) {
             throw new InvalidStatsException("Minutes played must be between 0 and 48.0");
         }
     }
