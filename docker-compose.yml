@@ -1,0 +1,95 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+      - redis
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/nba_stats?useSSL=false&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: nba_user
+      SPRING_DATASOURCE_PASSWORD: nba_password
+      SPRING_REDIS_HOST: redis
+      SPRING_REDIS_PORT: 6379
+      WAIT_HOSTS: db:3306,redis:6379
+      WAIT_TIMEOUT: 300
+    deploy:
+      replicas: 2
+      restart_policy:
+        condition: on-failure
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+    networks:
+      - nba-network
+
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: nba_stats
+      MYSQL_USER: nba_user
+      MYSQL_PASSWORD: nba_password
+      MYSQL_ROOT_PASSWORD: root_password
+    volumes:
+      - db-data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "nba_user", "-p$MYSQL_PASSWORD"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          cpus: '0.7'
+          memory: 1G
+    networks:
+      - nba-network
+      
+  redis:
+    image: redis:6.2-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          cpus: '0.3'
+          memory: 256M
+    networks:
+      - nba-network
+
+  load-balancer:
+    image: nginx:latest
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - "80:80"
+    depends_on:
+      - app
+    deploy:
+      resources:
+        limits:
+          cpus: '0.2'
+          memory: 128M
+    networks:
+      - nba-network
+
+networks:
+  nba-network:
+    driver: bridge
+
+volumes:
+  db-data:
+  redis-data:
